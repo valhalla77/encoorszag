@@ -6,6 +6,8 @@ using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Google;
 using Owin;
 using EncoOrszag.Models;
+using EncoOrszag.Models.DataAccess.Entities;
+using EncoOrszag.Models.DataAccess;
 
 namespace EncoOrszag
 {

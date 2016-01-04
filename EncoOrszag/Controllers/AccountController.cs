@@ -9,6 +9,8 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using EncoOrszag.Models;
+using EncoOrszag.Models.DataAccess.Entities;
+using EncoOrszag.Models.DataAccess;
 
 namespace EncoOrszag.Controllers
 {
@@ -151,10 +153,39 @@ namespace EncoOrszag.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser 
+                { 
+                    UserName = model.Email, 
+                    Email = model.Email,
+                    Orszag = new Orszag
+                    {
+                        Name = model.Orszagnev
+                    }
+                };
+                
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    //try
+                    //{
+                    //    using (var db = new ApplicationDbContext())
+                    //    {
+                    //        var orszag = new Orszag
+                    //        {
+                    //            Name = model.Orszagnev,
+                    //            User = user
+                    //        };
+                    //        db.Orszagok.Add(orszag);
+                    //        await db.SaveChangesAsync();
+                    //    }
+                    //}
+                    //catch (Exception e)
+                    //{
+                    //    ModelState.AddModelError("Orszagnev", e.Message);
+                    //    return View(model);
+                    //}
+
+                    
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
                     
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771

@@ -1,0 +1,45 @@
+﻿
+@model EncoOrszag.Models.ToborzasViewModel
+@{
+    ViewBag.Title = "Toborzás";
+}
+
+<h2>Toborzás</h2>
+
+<div>
+    <p><b>Szabad helyek száma: </b> @Model.Szabadhelyek</p>
+    <p><b>Arany </b> @Model.Arany</p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Egység</th>
+                <th>Támadás</th>
+                <th>Védekezés</th>
+                <th>Zsold/kör</th>
+                <th>Ellátmány/kör</th>
+                <th>Ár</th>
+                <th>Jelenleg Van</th>
+                <th>Ennyit veszek</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Egysegek.Count; i++)
+            {
+                var item = Model.Egysegek[i];
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.Tamadas</td>
+                    <td>@item.Vedekezes</td>
+                    <td>@item.Zsold</td>
+                    <td>@item.Ellatmany</td>
+                    <td>@item.Ar</td>
+                    <td>@item.JelenlegVan</td>
+                    <td>@Html.TextBoxFor(m => Model.Egysegek[i].Vetel)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+

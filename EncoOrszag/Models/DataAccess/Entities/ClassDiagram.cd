@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="EncoOrszag.Models.DataAccess.Entities.Egyseg">
+    <Position X="8.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAkAAAAAAAABAAAAAYAAAAIAIAAAAAAAAAABAA=</HashCode>
+      <FileName>Models\DataAccess\Entities\Egyseg.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="HadseregEgysegek" />
+      <Property Name="OrszagEgysegek" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="EncoOrszag.Models.DataAccess.Entities.Epulet">
+    <Position X="8.5" Y="1.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>QAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>Models\DataAccess\Entities\Epulet.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="OrszagEpuletek" />
+      <Property Name="OrszagEpuletKeszulesek" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="EncoOrszag.Models.DataAccess.Entities.Fejlesztes">
+    <Position X="8.5" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAEAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Models\DataAccess\Entities\Fejlesztes.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="OrszagFejlesztesek" />
+      <Property Name="OrszagFejlesztesKeszulesek" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="EncoOrszag.Models.DataAccess.Entities.Orszag">
+    <Position X="0.75" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAADQAAECAAAAAEADAAAAAQAAAAQAAAAAAAAAAAAABQ=</HashCode>
+      <FileName>Models\DataAccess\Entities\Orszag.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="OrszagEpuletek" />
+      <Property Name="OrszagEpuletKeszulesek" />
+      <Property Name="OrszagFejlesztesek" />
+      <Property Name="OrszagFejlesztesKeszulesek" />
+      <Property Name="SajatHadseregek" />
+      <Property Name="EllensegHadseregek" />
+      <Property Name="OrszagEgysegek" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="EncoOrszag.Models.DataAccess.Entities.OrszagEgyseg">
+    <Position X="3.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAQAAAAABAAAAAAAAAAAAAAABAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\DataAccess\Entities\OrszagEgyseg.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Orszag" />
+      <Property Name="Egyseg" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="EncoOrszag.Models.DataAccess.Entities.OrszagEpulet">
+    <Position X="3.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAABAAAAAAAAAAAAAAABAAAAAEAAAAAA=</HashCode>
+      <FileName>Models\DataAccess\Entities\OrszagEpulet.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Orszag" />
+      <Property Name="Epulet" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="EncoOrszag.Models.DataAccess.Entities.OrszagEpuletKeszul">
+    <Position X="3.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAABAAAgAEAAAAAA=</HashCode>
+      <FileName>Models\DataAccess\Entities\OrszagEpuletKeszul.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Orszag" />
+      <Property Name="Epulet" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="EncoOrszag.Models.DataAccess.Entities.OrszagFejlesztes">
+    <Position X="3.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAgAAAAAAAAAAAAAAAAAABAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\DataAccess\Entities\OrszagFejlesztes.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Orszag" />
+      <Property Name="Fejlesztes" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="EncoOrszag.Models.DataAccess.Entities.OrszagFejlesztesKeszul">
+    <Position X="3.75" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAgAAAAAAAAAAAAAAAAAABAAAgAAAAAAAA=</HashCode>
+      <FileName>Models\DataAccess\Entities\OrszagFejlesztesKeszul.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Orszag" />
+      <Property Name="Fejlesztes" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="EncoOrszag.Models.DataAccess.Entities.Hadsereg">
+    <Position X="13" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAEAAAAAAABAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\DataAccess\Entities\Hadsereg.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="SajatOrszag" />
+      <Property Name="CelOrszag" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="HadseregEgysegek" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="EncoOrszag.Models.DataAccess.Entities.HadseregEgyseg">
+    <Position X="12.75" Y="4.25" Width="1.5" />
+    <AssociationLine Name="Hadsereg" Type="EncoOrszag.Models.DataAccess.Entities.Hadsereg" FixedFromPoint="true">
+      <Path>
+        <Point X="13.938" Y="4.25" />
+        <Point X="13.938" Y="3.353" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAACAAAAQAAAAABAAAAAAAAAAAAAAAAAAAAAAgAAAAA=</HashCode>
+      <FileName>Models\DataAccess\Entities\HadseregEgyseg.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Egyseg" />
+      <Property Name="Hadsereg" />
+    </ShowAsAssociation>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

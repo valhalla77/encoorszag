@@ -11,6 +11,8 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using EncoOrszag.Models;
+using EncoOrszag.Models.DataAccess.Entities;
+using EncoOrszag.Models.DataAccess;
 
 namespace EncoOrszag
 {
