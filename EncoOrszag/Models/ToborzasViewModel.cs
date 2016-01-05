@@ -32,6 +32,7 @@ namespace EncoOrszag.Models
 
         public int JelenlegVan { get; set; }
 
-        public int Vetel { get; set; }
+        public int? Vetel { get; set; }
+
     }
 }

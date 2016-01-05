@@ -165,6 +165,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\EpitesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\ToborzasController.cs" />
@@ -198,6 +199,7 @@
     <Compile Include="Models\DataAccess\Entities\OrszagEpuletKeszul.cs" />
     <Compile Include="Models\DataAccess\Entities\OrszagFejlesztes.cs" />
     <Compile Include="Models\DataAccess\Entities\OrszagFejlesztesKeszul.cs" />
+    <Compile Include="Models\EpitesViewModel.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\OrszagOverviewViewModel.cs" />
     <Compile Include="Models\ToborzasViewModel.cs" />
@@ -261,6 +263,7 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Toborzas\Index.cshtml" />
+    <Content Include="Views\Epites\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

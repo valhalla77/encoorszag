@@ -6,10 +6,11 @@
 
 <h2>Toborzás</h2>
 
-<div>
-    <p><b>Szabad helyek száma: </b> @Model.Szabadhelyek</p>
-    <p><b>Arany </b> @Model.Arany</p>
+@using (Html.BeginForm()) { 
+    <p><b>Szabad helyek száma: </b> @Model.Szabadhelyek @Html.HiddenFor(m => Model.Szabadhelyek, new {id="szabadhely"})</p>
+    <p><b>Arany </b> @Model.Arany @Html.HiddenFor(m => Model.Arany, new { id = "arany" })</p>
 
+    @Html.ValidationSummary()
     <table class="table">
         <thead>
             <tr>
@@ -21,6 +22,7 @@
                 <th>Ár</th>
                 <th>Jelenleg Van</th>
                 <th>Ennyit veszek</th>
+                <th>Összesen</th>
             </tr>
         </thead>
         <tbody>
@@ -28,18 +30,101 @@
             {
                 var item = Model.Egysegek[i];
                 <tr>
-                    <td>@item.Name</td>
-                    <td>@item.Tamadas</td>
-                    <td>@item.Vedekezes</td>
-                    <td>@item.Zsold</td>
-                    <td>@item.Ellatmany</td>
-                    <td>@item.Ar</td>
-                    <td>@item.JelenlegVan</td>
-                    <td>@Html.TextBoxFor(m => Model.Egysegek[i].Vetel)</td>
+                    <td>    
+                        @item.Name
+                        @Html.HiddenFor(m =>Model.Egysegek[i].Name)
+                        @Html.HiddenFor(m =>Model.Egysegek[i].Id)
+                    </td>
+                    <td>
+                        @item.Tamadas
+                        @Html.HiddenFor(m => Model.Egysegek[i].Tamadas)
+                    </td>
+                    <td>
+                        @item.Vedekezes
+                        @Html.HiddenFor(m => Model.Egysegek[i].Vedekezes)
+                    </td>
+                    <td>
+                        @item.Zsold
+                        @Html.HiddenFor(m => Model.Egysegek[i].Zsold)
+                    </td>
+                    <td>
+                        @item.Ellatmany
+                        @Html.HiddenFor(m => Model.Egysegek[i].Ellatmany)
+                    </td>
+                    <td>
+                        @item.Ar
+                        @Html.HiddenFor(m => Model.Egysegek[i].Ar, new {@class="ar"})
+                    </td>
+                    <td>
+                        @item.JelenlegVan
+                        @Html.HiddenFor(m => Model.Egysegek[i].JelenlegVan)
+                    </td>
+                    <td>
+                        @Html.TextBoxFor(m => Model.Egysegek[i].Vetel, new {@class="vetel", @type="number" })
+                    </td>
+                    <td><span class="sorosszeg">@( item.Vetel.HasValue ? item.Vetel.Value * item.Ar : 0) </span> arany
+
+                    </td>
                 </tr>
             }
+            <tr>
+                <td colspan="7">Összesen</td>
+                <td id="osszeskatona"></td>
+                <td><span id="osszeg"></span> arany</td>
+            </tr>
         </tbody>
     </table>
-</div>
+    <input type="submit" class="btn btn-success" value="Vásárlás" id="vasarlas"/> 
+}
 
 
+@section scripts{
+    <script>
+        $(function () {
+            function calculate() {
+                var osszeg = 0;
+                $(".sorosszeg").each(function (index, element) {
+                    osszeg += parseInt($(element).html());
+                });
+
+                $("#osszeg").html(osszeg);
+
+                var osszeskatona = 0;
+                $(".vetel").each(function (index, element) {
+                    
+                    osszeskatona += parseInt($(element).val()) || 0;
+                });
+
+                $("#osszeskatona").html(osszeskatona);
+
+                
+                if (osszeg > parseInt($("#arany").val()) || osszeskatona > parseInt($("#szabadhely").val())){
+                    $("#vasarlas").prop("disabled", true);
+                }
+                else {
+                    $("#vasarlas").prop("disabled", false);
+                }
+                
+               
+                
+
+                
+            }
+
+            calculate();
+
+            $(".vetel").change(function () {
+                var vetel = $(this).val() || 0;
+                var tr = $(this).closest("tr");
+                var ar = tr.find(".ar").val();
+                var sorosszeg = vetel * ar;
+
+                tr.find(".sorosszeg").html(sorosszeg);
+
+                calculate();
+            });
+
+            
+        });
+    </script>
+}

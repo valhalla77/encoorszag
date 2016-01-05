@@ -12,8 +12,10 @@ using System.Threading.Tasks;
 
 namespace EncoOrszag.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
+        
         public async Task<ActionResult> Index()
         {
             var model = new OrszagOverviewViewModel();
