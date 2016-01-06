@@ -6,55 +6,81 @@
 <h2>Építés</h2>
 
 @Html.ValidationSummary()
-@using (Html.BeginForm()) {
-<table class="table">
-    <thead>
-        <tr>
-            <th>Épület</th>
-            <th>Építési Idő</th>
-            <th>Jelenleg Van</th>
-            <th>Jelenleg Épül</th>
-            <th>Hátralévő körök</th>
-            <th>Építés</th>
-            
-        </tr>
-    </thead>
-    <tbody>
-        @for (int i = 0; i < Model.Epuletek.Count; i++)
-        {
-            var item = Model.Epuletek[i];
+@using (Html.BeginForm("Index", "Epites", FormMethod.Post, new { id = "epitesform" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => Model.Epit, new { id = "epit", value = 0 })
+    <table class="table">
+        <thead>
             <tr>
-                <td>
-                    @item.Name
-                    @Html.HiddenFor(m => Model.Epuletek[i].Name)
-                    @Html.HiddenFor(m => Model.Epuletek[i].Id)
-                </td>
-                <td>
-                    @item.Ido
-                    @Html.HiddenFor(m => Model.Epuletek[i].Ido)
-                </td>
-                <td>
-                    @item.JelenlegVan
-                    @Html.HiddenFor(m => Model.Epuletek[i].JelenlegVan)
-                </td>
-                <td>
-                   <span class="keszul">false</span>
-                </td>
-                <td>
-                    @item.Hatravan
-                    @Html.HiddenFor(m => Model.Epuletek[i].Hatravan)
-                </td>
-                <td>
-                    <input type="submit" class="btn btn-success" value="Építés" id="vasarlas" />
-                </td>
-               
+                <th>Épület</th>
+                <th>Építési Idő</th>
+                <th>Jelenleg Van</th>
+                <th>Jelenleg Épül</th>
+                <th>Hátralévő körök</th>
+                <th>Építés</th>
+
             </tr>
-        }
-        <tr>
-            <td colspan="6" id="epithetsz"></td>
-            
-        </tr>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Epuletek.Count; i++)
+            {
+                var item = Model.Epuletek[i];
+                <tr>
+                    <td>
+                        @item.Name
+                        @Html.HiddenFor(m => Model.Epuletek[i].Name)
+                        @Html.HiddenFor(m => Model.Epuletek[i].Id, new { @class = "id" })
+                    </td>
+                    <td>
+                        @item.Ido
+                        @Html.HiddenFor(m => Model.Epuletek[i].Ido)
+                    </td>
+                    <td>
+                        @item.JelenlegVan
+                        @Html.HiddenFor(m => Model.Epuletek[i].JelenlegVan)
+                    </td>
+                    <td>
+                        <span class="keszul">@(Model.Epuletek[i].Hatravan == 0 ? "Nem" : "Épül")</span>
+                    </td>
+                    <td>
+                        @item.Hatravan
+                        @Html.HiddenFor(m => Model.Epuletek[i].Hatravan, new { @class = "hatravan" })
+                    </td>
+                    <td>
+                        <input type="button" class="btn btn-success vasarlas" value="Építés" @(Model.Epuletek.Any(e => e.Hatravan != 0) ? "disabled" : "") />
+                    </td>
+
+                </tr>
+            }
+           
+        </tbody>
+    </table>
 }
 
+@section scripts{
+    <script>
+        $(function () {
+
+
+
+
+
+            $(".vasarlas").click(function () {
+
+                var tr = $(this).closest("tr");
+                var id = tr.find(".id").val();
+
+                $("#epit").val(id);
+
+                $("#epitesform").submit();
+
+
+            });
+
+
+
+
+        });
+    </script>
+}

@@ -12,6 +12,7 @@ using EncoOrszag.Models.DataAccess.Entities;
 
 namespace EncoOrszag.Controllers
 {
+    [Authorize]
     public class ToborzasController : Controller
     {
 
@@ -60,6 +61,7 @@ namespace EncoOrszag.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<ActionResult> Index(ToborzasViewModel model)
         {
             using (var db = new ApplicationDbContext())

@@ -11,6 +11,7 @@ using System.Data.Entity;
 
 namespace EncoOrszag.Controllers
 {
+    [Authorize]
     public class EpitesController : Controller
     {
         public async Task<ActionResult> Index()
@@ -43,5 +44,59 @@ namespace EncoOrszag.Controllers
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Index(EpitesViewModel model)
+        {
+            
+
+            using (var db = new ApplicationDbContext())
+            {
+
+                var userId = HttpContext.User.Identity.GetUserId();
+
+                var orszag = await db.Orszagok
+                    .Include(o => o.User)
+                    .Include("OrszagEpuletek.Epulet")
+                    .Include("OrszagEpuletKeszulesek.Epulet")
+                    .SingleOrDefaultAsync(o => o.User.Id == userId);
+
+                var lehetsegesEpuletek = db.Epuletek.ToList();
+
+                var jelenlegepul = orszag.OrszagEpuletKeszulesek.Count();
+
+                var epit = model.Epit;
+
+                if (jelenlegepul != 0)
+                {
+                    ModelState.AddModelError("", "Egyszerre csak egy épület épülhet!");
+                }
+
+                if (epit == 0)
+                {
+                    ModelState.AddModelError("", "Nem választottál épületet!");
+                }
+
+                if (ModelState.IsValid)
+                {
+                    orszag.OrszagEpuletKeszulesek.Add(new Models.DataAccess.Entities.OrszagEpuletKeszul
+                    {
+                        Orszag = orszag,
+                        Epulet = lehetsegesEpuletek.Single(e => e.Id == epit),
+                        Hatravan = lehetsegesEpuletek.Single(e => e.Id == epit).Ido
+                    });
+
+                    await db.SaveChangesAsync();
+
+                    return RedirectToAction("Index");
+
+                }
+                else
+                {
+                    return View(model);
+                }
+
+            }
+        }
     }
 }

@@ -1,0 +1,84 @@
+﻿@model EncoOrszag.Models.FejlesztesViewModel
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Technológia</h2>
+
+@Html.ValidationSummary()
+@using (Html.BeginForm("Index", "Fejlesztes", FormMethod.Post, new { id = "fejlesztesform" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => Model.Fejleszt, new { id = "fejleszt", value = 0 })
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Fejlesztés</th>
+                <th>Kifejlesztési Idő</th>
+                <th>Kifejlesztve</th>
+                <th>Hátralévő körök</th>
+                <th>Fejlesztés</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Fejlesztesek.Count; i++)
+            {
+                var item = Model.Fejlesztesek[i];
+                <tr>
+                    <td>
+                        @item.Name
+                        @Html.HiddenFor(m => Model.Fejlesztesek[i].Name)
+                        @Html.HiddenFor(m => Model.Fejlesztesek[i].Id, new { @class = "id" })
+                    </td>
+                    <td>
+                        @item.Ido
+                        @Html.HiddenFor(m => Model.Fejlesztesek[i].Ido)
+                    </td>
+                    <td>
+                        @item.Kifejlesztve
+                        @Html.HiddenFor(m => Model.Fejlesztesek[i].Kifejlesztve, new { @class = "kifejlesztve" })
+                    </td>
+                    
+                    <td>
+                        @item.Hatravan
+                        @Html.HiddenFor(m => Model.Fejlesztesek[i].Hatravan, new { @class = "hatravan" })
+                    </td>
+                    <td>
+                        <input type="button" class="btn btn-success vasarlas" value="Fejlesztés" @(Model.Fejlesztesek.Any(e => e.Hatravan != 0) ? "disabled" : "") />
+                    </td>
+
+                </tr>
+            }
+           
+        </tbody>
+    </table>
+}
+
+@section scripts{
+    <script>
+        $(function () {
+
+
+
+
+
+            $(".vasarlas").click(function () {
+
+                var tr = $(this).closest("tr");
+                var id = tr.find(".id").val();
+
+                $("#fejleszt").val(id);
+
+                $("#fejlesztesform").submit();
+
+
+            });
+
+
+
+
+        });
+    </script>
+}
+

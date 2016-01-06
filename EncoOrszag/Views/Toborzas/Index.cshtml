@@ -6,7 +6,9 @@
 
 <h2>Toborzás</h2>
 
-@using (Html.BeginForm()) { 
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
     <p><b>Szabad helyek száma: </b> @Model.Szabadhelyek @Html.HiddenFor(m => Model.Szabadhelyek, new {id="szabadhely"})</p>
     <p><b>Arany </b> @Model.Arany @Html.HiddenFor(m => Model.Arany, new { id = "arany" })</p>
 
