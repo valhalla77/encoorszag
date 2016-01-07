@@ -13,9 +13,46 @@ namespace EncoOrszag.Helpers
       public static void Korvaltas()
       {
 
+
+         using (var db = new ApplicationDbContext())
+         {
+
+            var orszagok = db.Orszagok
+            .Include(o => o.User)
+            //.Include("OrszagEpuletek.Epulet")
+            .Include(o => o.OrszagEpuletek.Select(oe => oe.Epulet))
+            .Include("OrszagEpuletKeszulesek.Epulet")
+            .Include("OrszagEgysegek.Egyseg")
+            .Include("OrszagFejlesztesek.Fejlesztes")
+            .Include("OrszagFejlesztesKeszulesek.Fejlesztes")
+            //Hadsergek még ide
+            .ToList();
+
+
+            foreach (var orszag in orszagok)
+            {
+               Adozas(orszag);
+               Krumpli(orszag);
+               Zsold(orszag);
+               Ellatmany(orszag);
+
+            }
+
+            EpitesKeszul(db);
+            FejlesztesKeszul(db);
+
+            foreach (var orszag in orszagok)
+            {
+               //harc ide
+
+               Pontszam(orszag);
+            }
+            db.SaveChanges();
+         }
+         
       }
 
-      private void Adozas(Orszag orszag)
+      private static void Adozas(Orszag orszag)
       {
          var tanya = orszag.OrszagEpuletek.SingleOrDefault(o => o.Epulet.Name == "Tanya");
          var alkimia = orszag.OrszagFejlesztesek.SingleOrDefault(o => o.Fejlesztes.Name == "Alkímia");
@@ -31,38 +68,31 @@ namespace EncoOrszag.Helpers
          }
       }
 
-      private void Krumpli(Orszag orszag)
+      private static void Krumpli(Orszag orszag)
       {
          var tanya = orszag.OrszagEpuletek.SingleOrDefault(o => o.Epulet.Name == "Tanya");
          var traktor = orszag.OrszagFejlesztesek.SingleOrDefault(o => o.Fejlesztes.Name == "Traktor");
          var kombajn = orszag.OrszagFejlesztesek.SingleOrDefault(o => o.Fejlesztes.Name == "Kombájn");
 
          //1 tanya: 200 krumpli/kör, traktor 10%-al több krumpli, kombájn 15%-al több
+         var szorzo = 1.0;
+
+
          if (traktor != null)
          {
-            if (kombajn != null)
-            {
-               orszag.Krumpli += Convert.ToInt32((tanya == null ? 0 : tanya.Darab) * 200 * 1.15 * 1.10);
-            }
-            else
-            {
-               orszag.Krumpli += Convert.ToInt32((tanya == null ? 0 : tanya.Darab) * 200 * 1.10);
-            }
+            szorzo = szorzo * 1.1;
          }
-         else
+
+         if (kombajn != null)
          {
-            if (kombajn != null)
-            {
-               orszag.Krumpli += Convert.ToInt32((tanya == null ? 0 : tanya.Darab) * 200 * 1.15);
-            }
-            else
-            {
-               orszag.Krumpli += Convert.ToInt32((tanya == null ? 0 : tanya.Darab) * 200);
-            }
+            szorzo = szorzo * 1.15;
          }
+         orszag.Krumpli += Convert.ToInt32((tanya == null ? 0 : tanya.Darab) * 200 * szorzo);
+
+
       }
 
-      private void Zsold(Orszag orszag)
+      private static void Zsold(Orszag orszag)
       {
          var zsold = 0;
          foreach (var item in orszag.OrszagEgysegek)
@@ -70,11 +100,11 @@ namespace EncoOrszag.Helpers
             zsold += item.Darab * item.Egyseg.Zsold;
          }
 
-        
+
          orszag.Arany -= zsold;
       }
 
-      private void Ellatmany(Orszag orszag)
+      private static void Ellatmany(Orszag orszag)
       {
          var ellatmany = 0;
          foreach (var item in orszag.OrszagEgysegek)
@@ -85,10 +115,11 @@ namespace EncoOrszag.Helpers
          orszag.Krumpli -= ellatmany;
       }
 
-      private void EpitesKeszul(ApplicationDbContext db)
+      private static void EpitesKeszul(ApplicationDbContext db)
       {
          var epuletek = db.OrszagEpuletKeszulesek
-            .Include("Orszag.OrszagEpuletek.Epulet")
+            //.Include("Orszag.OrszagEpuletek.Epulet")
+            .Include(oek => oek.Orszag.OrszagEpuletek.Select(oe => oe.Epulet))
             .Include(e => e.Epulet)
             .ToList();
 
@@ -118,7 +149,7 @@ namespace EncoOrszag.Helpers
          db.OrszagEpuletKeszulesek.RemoveRange(db.OrszagEpuletKeszulesek.Where(e => e.Hatravan == 0));
       }
 
-      private void FejlesztesKeszul(ApplicationDbContext db)
+      private static void FejlesztesKeszul(ApplicationDbContext db)
       {
          var fejlesztesek = db.OrszagFejlesztesKeszulesek
             .Include("Orszag.OrszagFejlesztesek.Fejlesztes")
@@ -138,21 +169,25 @@ namespace EncoOrszag.Helpers
                   {
                      Orszag = item.Orszag,
                      Fejlesztes = item.Fejlesztes,
-                     
+
                   });
                }
-               
+
             }
          }
 
          db.OrszagFejlesztesKeszulesek.RemoveRange(db.OrszagFejlesztesKeszulesek.Where(e => e.Hatravan == 0));
       }
 
-      private void Pontszam(Orszag orszag)
+      private static void Pontszam(Orszag orszag)
       {
          var tanya = orszag.OrszagEpuletek.SingleOrDefault(oe => oe.Epulet.Name == "Tanya");
 
+         var tanyaszam = tanya == null ? 0 : tanya.Darab;
+
          var barakk = orszag.OrszagEpuletek.SingleOrDefault(oe => oe.Epulet.Name == "Barakk");
+
+         var barakkszam = barakk == null ? 0 : barakk.Darab;
 
          var lovasijasz = orszag.OrszagEgysegek.Where(oe => oe.Egyseg.Name == "Lovas" || oe.Egyseg.Name == "Íjász").Sum(o => o.Darab);
 
@@ -161,8 +196,8 @@ namespace EncoOrszag.Helpers
          var tudomany = orszag.OrszagFejlesztesek.Count();
 
          orszag.Pontszam =
-              tanya.Darab * 50 // emberek száma*1
-            + (tanya.Darab + barakk.Darab) * 50 //épületek száma*50
+              tanyaszam * 50 // emberek száma*1
+            + (tanyaszam + barakkszam) * 50 //épületek száma*50
             + lovasijasz * 5 //lovas, ijasz darab* 5
             + tudomany * 100 //fejlesztes * 100
             ;

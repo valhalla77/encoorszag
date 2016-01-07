@@ -16,7 +16,7 @@ namespace EncoOrszag.App_Start
 
             scheduler.Start();
 
-            IJobDetail job = JobBuilder.Create<KorvaltasTask>().Build();
+            IJobDetail job = JobBuilder.Create<KorvaltasTask>().WithIdentity("korvaltas", "default").Build();
 
             ITrigger trigger = TriggerBuilder.Create().StartNow().WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever()).Build();
 

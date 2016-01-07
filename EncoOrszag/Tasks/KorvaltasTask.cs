@@ -1,4 +1,5 @@
-﻿using EncoOrszag.Models.DataAccess.Entities;
+﻿using EncoOrszag.Helpers;
+using EncoOrszag.Models.DataAccess.Entities;
 using Quartz;
 using System;
 using System.Collections.Generic;
@@ -7,15 +8,15 @@ using System.Web;
 
 namespace EncoOrszag.Tasks
 {
-    public class KorvaltasTask :IJob
-    {
+   public class KorvaltasTask : IJob
+   {
 
-        public void Execute(IJobExecutionContext context)
-        {
-            
-           
-        }
+      public void Execute(IJobExecutionContext context)
+      {
+         KorvaltasHelper.Korvaltas();
 
-        
-    }
+      }
+
+
+   }
 }
