@@ -1,0 +1,98 @@
+﻿@model EncoOrszag.Models.HaboruViewModel
+@{
+   ViewBag.Title = "Háború";
+}
+<div ng-app="haboruApp" ng-controller="haboruController">
+   <h2>Háború</h2>
+   <table class="table">
+      <thead>
+         <tr>
+            <th>Egység</th>
+            <th>Támadás</th>
+            <th>Védekezés</th>
+            <th>Összesen Van</th>
+            <th>Jelenleg Van</th>
+
+         </tr>
+      </thead>
+      <tbody>
+         <tr ng-repeat="egyseg in model.JelenlegiEgysegek">
+            <td>
+               {{egyseg.Name}}
+            </td>
+            <td>
+               {{egyseg.Tamadas}}
+            </td>
+            <td>
+               {{egyseg.Vedekezes}}
+            </td>
+            <td>
+               {{egyseg.OsszesenVan}}
+            </td>
+            <td>
+               {{egyseg.JelenlegVan}}
+            </td>
+         </tr>
+      </tbody>
+   </table>
+   <table class="table">
+      <thead>
+         <tr>
+            <th>Hadsereg</th>
+            <th>Célország</th>
+            <th ng-repeat="egyseg in model.JelenlegiEgysegek">
+               {{egyseg.Name}}
+            </th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr ng-repeat="hadsereg in model.Hadseregek">
+            <td>
+               {{hadsereg.Id}}
+            </td>
+            <td>
+               {{hadsereg.CelOrszag}}
+            </td>
+            <td ng-repeat="egyseg in hadsereg.HadseregEgysegek">
+               {{egyseg.Darab}}
+            </td>
+         </tr>
+         <tr>
+            <td>
+               Támadás új hadsereggel
+            </td>
+            <td>
+               <select ng-model="">
+
+               </select>
+            </td>
+         </tr>
+      </tbody>
+   </table>
+
+
+
+</div>
+
+
+
+
+@section scripts{
+   @Scripts.Render("/bundles/angular")
+   <script>
+      var model = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+   </script>
+   <script>
+      (function () {
+
+         "use strict";
+
+         angular.module("haboruApp", [])
+         .controller("haboruController", ["$scope", "$window", function($scope, $window){
+            $scope.model = $window.model;
+         }]);
+
+      })();
+   </script>
+
+}
