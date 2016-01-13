@@ -52,7 +52,9 @@ namespace EncoOrszag.Controllers
             {
                Id = sh.Id,
                CelOrszag = sh.CelOrszag.Name,
-               HadseregEgysegek = sh.HadseregEgysegek.Select(he => new HadseregEgysegListViewModel {
+               CelOrszagId = sh.CelOrszag.Id,
+               HadseregEgysegek = sh.HadseregEgysegek.Select(he => new HadseregEgysegListViewModel
+               {
 
                   Id = he.Id,
                   Egyseg = he.Egyseg.Name,
@@ -69,6 +71,48 @@ namespace EncoOrszag.Controllers
 
 
          return View(model);
+      }
+
+      [HttpPost]
+      [ValidateAntiForgeryToken]
+      public async Task<ActionResult> Ujhadsereg(HaboruHadseregListViewModel model)
+      {
+         using (var db = new ApplicationDbContext())
+         {
+
+            var userId = HttpContext.User.Identity.GetUserId();
+            var orszag = await db.Orszagok
+              .Include(o => o.User)
+              .Include(o => o.OrszagEgysegek.Select(oe => oe.Egyseg))
+              .Include(o => o.SajatHadseregek.Select(sh => sh.HadseregEgysegek.Select(he => he.Egyseg)))
+              .Include(o => o.SajatHadseregek.Select(sh => sh.CelOrszag))
+              .SingleOrDefaultAsync(o => o.User.Id == userId);
+
+            if (db.Orszagok.Any(o => o.Id == model.CelOrszagId))
+            {
+               foreach (var item in model.HadseregEgysegek)
+               {
+                  ////ittartok
+               }
+            }
+
+            //ellenorzes model
+            //mentes
+            //visszaadas, hadsereg+success vagy error
+
+            return Json(new
+            {
+               Success = true,
+               UjHadsereg = model
+            });
+
+
+            return Json(new
+            {
+               Success = false
+            });
+
+         }
       }
    }
 }

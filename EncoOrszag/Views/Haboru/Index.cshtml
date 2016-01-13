@@ -4,6 +4,10 @@
 }
 <div ng-app="haboruApp" ng-controller="haboruController">
    <h2>Háború</h2>
+
+   {{model | json}}
+
+   {{ujhadsereg | json}}
    <table class="table">
       <thead>
          <tr>
@@ -35,6 +39,7 @@
          </tr>
       </tbody>
    </table>
+
    <table class="table">
       <thead>
          <tr>
@@ -57,16 +62,26 @@
                {{egyseg.Darab}}
             </td>
          </tr>
+
+
          <tr>
             <td>
                Támadás új hadsereggel
             </td>
             <td>
-               <select ng-model="">
-
+               <select ng-model="ujhadsereg.CelOrszagId">
+                  <option ng-repeat="orszag in model.Orszagok" value="{{orszag.Value}}">{{orszag.Text}}</option>
                </select>
             </td>
+            <td ng-repeat="egyseg in model.JelenlegiEgysegek">
+               <input type="number" ng-model="ujhadsereg.HadseregEgysegek[$index].Darab" min="0" />
+
+            </td>
+            <td>
+               <button class="btn btn-success" ng-click="ujhadseregletrehozas()">Indítás</button>
+            </td>
          </tr>
+
       </tbody>
    </table>
 
@@ -90,7 +105,40 @@
          angular.module("haboruApp", [])
          .controller("haboruController", ["$scope", "$window", function($scope, $window){
             $scope.model = $window.model;
+
+
+            function Ujhadsereg (){
+               var ujhadsereg = {
+
+                  CelorszagId : null,
+                  HadseregEgysegek : []
+               };
+
+               angular.forEach($scope.model.JelenlegiEgysegek, function (value, key){
+                  ujhadsereg.HadseregEgysegek.push({
+                     Id: value.Id,
+                     Egyseg: value.Name,
+                     Darab: 0
+                  });
+               })
+               return ujhadsereg;
+            }
+
+            $scope.ujhadsereg = Ujhadsereg();
+            $scope.ujhadseregletrehozas = function(){
+               $http.post('/Haboru/Ujhadsereg', $scope.ujhadsereg).then(
+                  function (response){
+                     if (response.data.Success){
+                        $scope.model.Hadseregek.push(response.data.UjHadsereg);
+                        $scope.ujhadsereg = Ujhadsereg();
+                        alert("Sikeresen elindítottad a hadsereget!");
+                     }
+                  }, function (response){
+                     alert("HTTP hiba");
+                  });
+            }
          }]);
+
 
       })();
    </script>

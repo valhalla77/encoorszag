@@ -38,6 +38,8 @@ namespace EncoOrszag.Models
 
       public string CelOrszag { get; set; }
 
+      public int CelOrszagId { get; set; }
+
       public List<HadseregEgysegListViewModel> HadseregEgysegek { get; set; }
    }
 
