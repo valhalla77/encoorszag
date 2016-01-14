@@ -58,7 +58,7 @@ namespace EncoOrszag.Controllers
                HadseregEgysegek = sh.HadseregEgysegek.Select(he => new HadseregEgysegListViewModel
                {
 
-                  Id = he.Id,
+                  Id = he.Egyseg.Id,
                   Egyseg = he.Egyseg.Name,
                   Darab = he.Darab
                }).ToList()

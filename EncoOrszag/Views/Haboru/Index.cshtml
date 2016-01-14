@@ -1,89 +1,89 @@
 ﻿@model EncoOrszag.Models.HaboruViewModel
 @{
-   ViewBag.Title = "Háború";
+    ViewBag.Title = "Háború";
 }
 <div ng-app="haboruApp" ng-controller="haboruController">
-   <h2>Háború</h2>
+    <h2>Háború</h2>
 
-   {{model | json}}
+    {{model | json}}
 
-   {{ujhadsereg | json}}
-   <table class="table">
-      <thead>
-         <tr>
-            <th>Egység</th>
-            <th>Támadás</th>
-            <th>Védekezés</th>
-            <th>Összesen Van</th>
-            <th>Jelenleg Van</th>
+    {{ujhadsereg | json}}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Egység</th>
+                <th>Támadás</th>
+                <th>Védekezés</th>
+                <th>Összesen Van</th>
+                <th>Jelenleg Van</th>
 
-         </tr>
-      </thead>
-      <tbody>
-         <tr ng-repeat="egyseg in model.JelenlegiEgysegek">
-            <td>
-               {{egyseg.Name}}
-            </td>
-            <td>
-               {{egyseg.Tamadas}}
-            </td>
-            <td>
-               {{egyseg.Vedekezes}}
-            </td>
-            <td>
-               {{egyseg.OsszesenVan}}
-            </td>
-            <td>
-               {{egyseg.JelenlegVan}}
-            </td>
-         </tr>
-      </tbody>
-   </table>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="egyseg in model.JelenlegiEgysegek">
+                <td>
+                    {{egyseg.Name}}
+                </td>
+                <td>
+                    {{egyseg.Tamadas}}
+                </td>
+                <td>
+                    {{egyseg.Vedekezes}}
+                </td>
+                <td>
+                    {{egyseg.OsszesenVan}}
+                </td>
+                <td>
+                    {{egyseg.JelenlegVan}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
-   <table class="table">
-      <thead>
-         <tr>
-            <th>Hadsereg</th>
-            <th>Célország</th>
-            <th ng-repeat="egyseg in model.JelenlegiEgysegek">
-               {{egyseg.Name}}
-            </th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr ng-repeat="hadsereg in model.Hadseregek">
-            <td>
-               {{hadsereg.Id}}
-            </td>
-            <td>
-               {{hadsereg.CelOrszag}}
-            </td>
-            <td ng-repeat="egyseg in hadsereg.HadseregEgysegek">
-               {{egyseg.Darab}}
-            </td>
-         </tr>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Hadsereg</th>
+                <th>Célország</th>
+                <th ng-repeat="egyseg in model.JelenlegiEgysegek">
+                    {{egyseg.Name}}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="hadsereg in model.Hadseregek">
+                <td>
+                    {{hadsereg.Id}}
+                </td>
+                <td>
+                    {{hadsereg.CelOrszag}}
+                </td>
+                <td ng-repeat="egyseg in hadsereg.HadseregEgysegek">
+                    {{egyseg.Darab}}
+                </td>
+            </tr>
 
 
-         <tr>
-            <td>
-               Támadás új hadsereggel
-            </td>
-            <td>
-               <select ng-model="ujhadsereg.CelOrszagId">
-                  <option ng-repeat="orszag in model.Orszagok" value="{{orszag.Value}}">{{orszag.Text}}</option>
-               </select>
-            </td>
-            <td ng-repeat="egyseg in model.JelenlegiEgysegek">
-               <input type="number" ng-model="ujhadsereg.HadseregEgysegek[$index].Darab" min="0" />
+            <tr>
+                <td>
+                    Támadás új hadsereggel
+                </td>
+                <td>
+                    <select ng-model="ujhadsereg.CelOrszagId">
+                        <option ng-repeat="orszag in model.Orszagok" value="{{orszag.Value}}">{{orszag.Text}}</option>
+                    </select>
+                </td>
+                <td ng-repeat="egyseg in model.JelenlegiEgysegek">
+                    <input type="number" ng-model="ujhadsereg.HadseregEgysegek[$index].Darab" min="0" />
 
-            </td>
-            <td>
-               <button class="btn btn-success" ng-click="ujhadseregletrehozas()">Indítás</button>
-            </td>
-         </tr>
+                </td>
+                <td>
+                    <button class="btn btn-success" ng-click="ujhadseregletrehozas()">Indítás</button>
+                </td>
+            </tr>
 
-      </tbody>
-   </table>
+        </tbody>
+    </table>
 
 
 
@@ -93,79 +93,85 @@
 
 
 @section scripts{
-   @Scripts.Render("/bundles/angular")
-   <script>
-      var model = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
-   </script>
-   <script>
-      (function () {
+    @Scripts.Render("/bundles/angular")
+    <script>
+        var model = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+    </script>
+    <script>
+        (function () {
 
-         "use strict";
+            "use strict";
 
-         angular.module("haboruApp", ['angular-linq'])
-         
-         .controller("haboruController", ["$scope", "$window", "$http", "$linq", function($scope, $window, $http, $linq){
-            $scope.model = $window.model;
+            angular.module("haboruApp", ['angular-linq'])
 
-
-            function Ujhadsereg (){
-               var ujhadsereg = {
-
-                  CelOrszagId : null,
-                  HadseregEgysegek : []
-               };
-
-               angular.forEach($scope.model.JelenlegiEgysegek, function (value, key){
-                  ujhadsereg.HadseregEgysegek.push({
-                     Id: value.Id,
-                     Egyseg: value.Name,
-                     Darab: 0
-                  });
-               })
-               return ujhadsereg;
-            }
-
-            function UpdateJelenlegi(ujhadsereg){
-               angular.forEach($scope.model.JelenlegiEgysegek, function (value, key){
-                  var hadseregysegek = $linq.Enumerable().From($scope.model.Hadseregek)
-                     .Select(function (x) {return x.HadseregEgysegek})
-                     .ToArray();
-                  
-                  var egysegszam = $linq.Enumerable().From(hadseregysegek)
-                     .Where(function (x) { return x.Id == value.Id})
-                     .Select(function (x) { return x.Darab})
-                     .Sum();
-
-                  
-                  value.JelenlegVan = value.OsszesenVan - egysegszam;
-               });
-               
-
-            }
-
-            $scope.ujhadsereg = Ujhadsereg();
-            $scope.ujhadseregletrehozas = function(){
-               $http.post('/Haboru/Ujhadsereg', $scope.ujhadsereg).then(
-                  function (response){
-                     if (response.data.Success){
-                        $scope.model.Hadseregek.push(response.data.UjHadsereg);
-                        UpdateJelenlegi(response.data.Ujhadsereg);
-                        $scope.ujhadsereg = Ujhadsereg();
-                        alert("Sikeresen elindítottad a hadsereget!");
-                       
-
-                     }
-                     else {
-                        alert("Nem sikerült elinditani a hadsereget!")
-                     }
-                  }, function (response){
-                     alert("HTTP hiba");
-                  });
-            }
-         }]);
+            .controller("haboruController", ["$scope", "$window", "$http", "$linq", function($scope, $window, $http, $linq){
+                $scope.model = $window.model;
 
 
-      })();
-   </script>
+                function Ujhadsereg (){
+                    var ujhadsereg = {
+
+                        CelOrszagId : null,
+                        HadseregEgysegek : []
+                    };
+
+                    angular.forEach($scope.model.JelenlegiEgysegek, function (value, key){
+                        ujhadsereg.HadseregEgysegek.push({
+                            Id: value.Id,
+                            Egyseg: value.Name,
+                            Darab: 0
+                        });
+                    })
+                    return ujhadsereg;
+                }
+
+                function UpdateJelenlegi(){
+                    angular.forEach($scope.model.JelenlegiEgysegek, function (egyseg, egysegKey){
+                        var jelenleg = egyseg.OsszesenVan;
+
+                        angular.forEach($scope.model.Hadseregek, function (hadsereg, hadseregKey) {
+                            var hadseregEgyseg = $linq.Enumerable().From(hadsereg.HadseregEgysegek)
+                                .Single(function (x) { return x.Id == egyseg.Id; });
+                            jelenleg -= hadseregEgyseg.Darab;
+                        });
+
+                        egyseg.JelenlegVan = jelenleg;
+                    });
+
+
+                }               
+                
+                $scope.$watch(
+                    function () { return $scope.ujhadsereg; },
+                    function (oldValue, newValue) {
+                        if (oldValue !== newValue) {
+                            
+                        }
+                    }, true);
+
+                $scope.ujhadsereg = Ujhadsereg();
+                $scope.ujhadseregletrehozas = function(){
+                    $http.post('/Haboru/Ujhadsereg', $scope.ujhadsereg).then(
+                       function (response){
+                           if (response.data.Success){
+                               $scope.model.Hadseregek.push(response.data.UjHadsereg);
+                               UpdateJelenlegi();
+                               $scope.ujhadsereg = Ujhadsereg();
+                               alert("Sikeresen elindítottad a hadsereget!");
+
+
+                           }
+                           else {
+                               alert("Nem sikerült elinditani a hadsereget!")
+                           }
+                       }, function (response){
+                           alert("HTTP hiba");
+                       });
+                }
+            }]);
+
+
+        })();
+    </script>
 
 }
