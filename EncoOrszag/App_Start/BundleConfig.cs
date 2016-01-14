@@ -27,7 +27,9 @@ namespace EncoOrszag
                    "~/Content/bootstrap.css",
                    "~/Content/site.css"));
          bundles.Add(new ScriptBundle("~/bundles/angular").Include(
-                  "~/Scripts/angular.js"));
+                  "~/Scripts/angular.js", 
+                  "~/Scripts/angular-linq.min.js"));
+         
 
       }
    }

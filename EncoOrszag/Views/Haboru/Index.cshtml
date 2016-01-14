@@ -102,15 +102,16 @@
 
          "use strict";
 
-         angular.module("haboruApp", [])
-         .controller("haboruController", ["$scope", "$window", function($scope, $window){
+         angular.module("haboruApp", ['angular-linq'])
+         
+         .controller("haboruController", ["$scope", "$window", "$http", "$linq", function($scope, $window, $http, $linq){
             $scope.model = $window.model;
 
 
             function Ujhadsereg (){
                var ujhadsereg = {
 
-                  CelorszagId : null,
+                  CelOrszagId : null,
                   HadseregEgysegek : []
                };
 
@@ -124,14 +125,38 @@
                return ujhadsereg;
             }
 
+            function UpdateJelenlegi(ujhadsereg){
+               angular.forEach($scope.model.JelenlegiEgysegek, function (value, key){
+                  var hadseregysegek = $linq.Enumerable().From($scope.model.Hadseregek)
+                     .Select(function (x) {return x.HadseregEgysegek})
+                     .ToArray();
+                  
+                  var egysegszam = $linq.Enumerable().From(hadseregysegek)
+                     .Where(function (x) { return x.Id == value.Id})
+                     .Select(function (x) { return x.Darab})
+                     .Sum();
+
+                  
+                  value.JelenlegVan = value.OsszesenVan - egysegszam;
+               });
+               
+
+            }
+
             $scope.ujhadsereg = Ujhadsereg();
             $scope.ujhadseregletrehozas = function(){
                $http.post('/Haboru/Ujhadsereg', $scope.ujhadsereg).then(
                   function (response){
                      if (response.data.Success){
                         $scope.model.Hadseregek.push(response.data.UjHadsereg);
+                        UpdateJelenlegi(response.data.Ujhadsereg);
                         $scope.ujhadsereg = Ujhadsereg();
                         alert("Sikeresen elindítottad a hadsereget!");
+                       
+
+                     }
+                     else {
+                        alert("Nem sikerült elinditani a hadsereget!")
                      }
                   }, function (response){
                      alert("HTTP hiba");

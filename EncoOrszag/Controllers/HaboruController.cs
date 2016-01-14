@@ -8,9 +8,11 @@ using System.Web;
 using System.Web.Mvc;
 using System.Data.Entity;
 using Microsoft.AspNet.Identity;
+using EncoOrszag.Models.DataAccess.Entities;
 
 namespace EncoOrszag.Controllers
 {
+   [Authorize]
    public class HaboruController : Controller
    {
       public async Task<ActionResult> Index()
@@ -32,7 +34,7 @@ namespace EncoOrszag.Controllers
 
             var osszesorszag = db.Orszagok.ToList();
 
-            model.Orszagok = osszesorszag.Select(e => new SelectListItem
+            model.Orszagok = osszesorszag.Where(o => o.Id != orszag.Id).Select(e => new SelectListItem
             {
                Text = e.Name,
                Value = e.Id.ToString()
@@ -74,7 +76,7 @@ namespace EncoOrszag.Controllers
       }
 
       [HttpPost]
-      [ValidateAntiForgeryToken]
+     
       public async Task<ActionResult> Ujhadsereg(HaboruHadseregListViewModel model)
       {
          using (var db = new ApplicationDbContext())
@@ -88,29 +90,72 @@ namespace EncoOrszag.Controllers
               .Include(o => o.SajatHadseregek.Select(sh => sh.CelOrszag))
               .SingleOrDefaultAsync(o => o.User.Id == userId);
 
-            if (db.Orszagok.Any(o => o.Id == model.CelOrszagId))
+            var lehetsegesEgysegek = db.Egysegek.ToList();
+
+            var jelenlegiEgysegek = lehetsegesEgysegek.Select(e => new HaboruEgysegListViewModel
             {
-               foreach (var item in model.HadseregEgysegek)
-               {
-                  ////ittartok
-               }
+               Id = e.Id,
+               Name = e.Name,
+               Tamadas = e.Tamadas,
+               Vedekezes = e.Vedekezes,
+               OsszesenVan = orszag.OrszagEgysegek.Where(oe => oe.Egyseg.Id == e.Id).Sum(oe => oe.Darab)
+            }).ToList();
+
+            foreach (var item in jelenlegiEgysegek)
+            {
+               var hadseregben = orszag.SajatHadseregek.Sum(sh => sh.HadseregEgysegek.SingleOrDefault(he => he.Egyseg.Id == item.Id).Darab);
+               item.JelenlegVan = item.OsszesenVan - hadseregben;
             }
 
-            //ellenorzes model
-            //mentes
-            //visszaadas, hadsereg+success vagy error
 
-            return Json(new
+            if (db.Orszagok.Any(o => o.Id == model.CelOrszagId))
             {
-               Success = true,
-               UjHadsereg = model
-            });
 
+               foreach (var item in model.HadseregEgysegek)
+               {
+                  if (jelenlegiEgysegek.Single(je => je.Id == item.Id).JelenlegVan < item.Darab)
+                  {
 
-            return Json(new
+                     ModelState.AddModelError("", "Nincs elég egység!");
+                  }
+               }
+            }
+            else
             {
-               Success = false
-            });
+               ModelState.AddModelError("", "Nincs ilyen ország!");
+            }
+            if (ModelState.IsValid)
+            {
+               var ujhadsereg = new Hadsereg
+               {
+                  CelOrszag = db.Orszagok.SingleOrDefault(o => o.Id == model.CelOrszagId),
+                  HadseregEgysegek = model.HadseregEgysegek.Select(he => new HadseregEgyseg
+                  {
+                     Egyseg = lehetsegesEgysegek.Single(le => le.Id == he.Id),
+                     Darab = he.Darab
+                  }).ToList()
+               };
+               orszag.SajatHadseregek.Add(ujhadsereg);
+
+               await db.SaveChangesAsync();
+               model.Id = ujhadsereg.Id;
+               model.CelOrszag = ujhadsereg.CelOrszag.Name;
+
+               return Json(new
+               {
+                  Success = true,
+                  UjHadsereg = model
+               });
+
+            }
+            else
+            {
+               return Json(new
+               {
+                  Success = false
+               });
+            }
+
 
          }
       }

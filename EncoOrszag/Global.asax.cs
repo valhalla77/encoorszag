@@ -18,6 +18,7 @@ namespace EncoOrszag
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             TaskConfig.Init();
+            BundleTable.EnableOptimizations = false;
         }
     }
 }
