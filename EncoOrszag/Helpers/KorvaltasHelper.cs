@@ -19,15 +19,20 @@ namespace EncoOrszag.Helpers
 
             var orszagok = db.Orszagok
             .Include(o => o.User)
-            //.Include("OrszagEpuletek.Epulet")
+
             .Include(o => o.OrszagEpuletek.Select(oe => oe.Epulet))
             .Include("OrszagEpuletKeszulesek.Epulet")
             .Include("OrszagEgysegek.Egyseg")
             .Include("OrszagFejlesztesek.Fejlesztes")
             .Include("OrszagFejlesztesKeszulesek.Fejlesztes")
-            //Hadsergek még ide
+            //.Include(o => o.SajatHadseregek.Select(sh => sh.HadseregEgysegek.Select(he => he.Egyseg)))
             .ToList();
 
+            var hadseregek = db.Hadseregek
+               .Include(h => h.HadseregEgysegek.Select(he => he.Egyseg))
+               .Include(h => h.CelOrszag.OrszagEgysegek.Select(oe => oe.Egyseg))
+               .ToList();
+            var lehetsegesEgysegek = db.Egysegek.ToList();
 
             foreach (var orszag in orszagok)
             {
@@ -41,15 +46,20 @@ namespace EncoOrszag.Helpers
             EpitesKeszul(db);
             FejlesztesKeszul(db);
 
+            foreach (var hadsereg in hadseregek)
+            {
+               var celorszag = orszagok.Single(o => o == hadsereg.CelOrszag);
+               var sajatorszag = orszagok.Single(o => o == hadsereg.SajatOrszag);
+               Harc(hadsereg, celorszag, sajatorszag,  lehetsegesEgysegek);
+            }
+
             foreach (var orszag in orszagok)
             {
-               //harc ide
-
                Pontszam(orszag);
             }
             db.SaveChanges();
          }
-         
+
       }
 
       private static void Adozas(Orszag orszag)
@@ -179,6 +189,48 @@ namespace EncoOrszag.Helpers
          db.OrszagFejlesztesKeszulesek.RemoveRange(db.OrszagFejlesztesKeszulesek.Where(e => e.Hatravan == 0));
       }
 
+      private static void Harc(Hadsereg hadsereg, Orszag celorszag, Orszag sajatorszag, List<Egyseg> lehetsegesEgysegek)
+      {
+         var tamadoertek = 0;
+         var vedoertek = 0;
+
+         ///FEJLESZTESEK!!!!
+
+         //a hadseregek tamadoertekenek szamitasa
+         foreach (var egyseg in hadsereg.HadseregEgysegek)
+         {
+            tamadoertek += egyseg.Egyseg.Tamadas * egyseg.Darab;
+         }
+
+         //celorszag vedoerteke
+         var vedoegysegek = lehetsegesEgysegek.Select(e => new
+         {
+            
+            Vedekezes = e.Vedekezes,
+            JelenlegVan = 
+            celorszag.OrszagEgysegek.Where(oe => oe.Egyseg.Id == e.Id).Sum(oe => oe.Darab)  //összesegység
+            - celorszag.SajatHadseregek.Sum(h => h.HadseregEgysegek.SingleOrDefault(he => he.Egyseg.Id == e.Id).Darab) //jelenleg hadseregben, tehát nem véd
+
+         });
+
+         foreach (var item in vedoegysegek)
+         {
+            vedoertek += item.JelenlegVan * item.Vedekezes;
+         }
+
+         ////harc
+         //győzelem
+         if (tamadoertek > vedoertek)
+         {
+            
+         }
+         else //vereség
+         {
+
+         }
+
+
+      }
       private static void Pontszam(Orszag orszag)
       {
          var tanya = orszag.OrszagEpuletek.SingleOrDefault(oe => oe.Epulet.Name == "Tanya");
