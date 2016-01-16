@@ -13,7 +13,10 @@ namespace EncoOrszag.Tasks
 
       public void Execute(IJobExecutionContext context)
       {
-         KorvaltasHelper.Korvaltas();
+            using (var korvaltasHelper = new KorvaltasHelper())
+            {
+                korvaltasHelper.Korvaltas();
+            }
 
       }
 

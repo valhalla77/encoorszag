@@ -91,9 +91,12 @@ namespace EncoOrszag.Controllers
 
       public ActionResult Korvaltas(string returnUrl)
       {
-        
-         KorvaltasHelper.Korvaltas();
-         return RedirectToLocal(returnUrl);
+
+            using (var korvaltasHelper = new KorvaltasHelper())
+            {
+                korvaltasHelper.Korvaltas();
+            }
+            return RedirectToLocal(returnUrl);
       }
 
       private ActionResult RedirectToLocal(string returnUrl)
