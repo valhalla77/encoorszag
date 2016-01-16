@@ -183,6 +183,7 @@
     <Compile Include="Controllers\HaboruController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\RangsorController.cs" />
     <Compile Include="Controllers\ToborzasController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -220,6 +221,7 @@
     <Compile Include="Models\HaboruViewModel.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\OrszagOverviewViewModel.cs" />
+    <Compile Include="Models\RangsorViewModel.cs" />
     <Compile Include="Models\ToborzasViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -1071,6 +1073,7 @@
     <Content Include="Views\Fejlesztes\Index.cshtml" />
     <Content Include="Views\Haboru\Index.cshtml" />
     <Content Include="Scripts\version.json" />
+    <Content Include="Views\Rangsor\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

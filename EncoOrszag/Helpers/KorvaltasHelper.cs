@@ -56,22 +56,24 @@ namespace EncoOrszag.Helpers
                 Zsold(orszag);
                 Ellatmany(orszag);
 
+
             }
+            db.SaveChanges();
 
             EpitesKeszul();
             FejlesztesKeszul();
 
-            foreach (var hadsereg in hadseregek)
-            {
-                var celorszag = orszagok.Single(o => o == hadsereg.CelOrszag);
-                var sajatorszag = orszagok.Single(o => o == hadsereg.SajatOrszag);
-                Harc(hadsereg, celorszag, sajatorszag, lehetsegesEgysegek);
-            }
+            db.SaveChanges();
+
+            Harc();
+
+            db.SaveChanges();
 
             foreach (var orszag in orszagok)
             {
                 Pontszam(orszag);
             }
+
             db.SaveChanges();
 
 
@@ -91,6 +93,7 @@ namespace EncoOrszag.Helpers
             {
                 orszag.Arany += Convert.ToInt32((tanya == null ? 0 : tanya.Darab) * 50 * 25);
             }
+
         }
 
         private void Krumpli(Orszag orszag)
@@ -224,18 +227,52 @@ namespace EncoOrszag.Helpers
                 var celorszag = hadsereg.CelOrszag;
                 var sajatorszag = hadsereg.SajatOrszag;
                 var gyozelem = Csata(hadsereg, celorszag, sajatorszag, lehetsegesEgysegek);
+
+                if (gyozelem)
+                {
+                    //védőegységek veszteségei
+                    var vedoegysegek = lehetsegesEgysegek.Select(e => new
+                    {
+                        Id = e.Id,
+                        JelenlegVan =
+                        celorszag.OrszagEgysegek.Where(oe => oe.Egyseg.Id == e.Id).Sum(oe => oe.Darab)  //összesegység
+                        - celorszag.SajatHadseregek.Sum(h => h.HadseregEgysegek.SingleOrDefault(he => he.Egyseg.Id == e.Id).Darab) //jelenleg hadseregben, tehát nem véd
+
+                    });
+
+                    foreach (var item in vedoegysegek)
+                    {
+                        celorszag.OrszagEgysegek.Single(oe => oe.Egyseg.Id == item.Id).Darab -= Convert.ToInt32(item.JelenlegVan * 0.1); 
+                    }
+
+                    celorszag.Arany = Convert.ToInt32(celorszag.Arany * 0.5);
+                    sajatorszag.Arany += Convert.ToInt32(celorszag.Arany * 0.5);
+
+                    celorszag.Krumpli = Convert.ToInt32(celorszag.Krumpli * 0.5);
+                    sajatorszag.Krumpli += Convert.ToInt32(celorszag.Krumpli * 0.5);
+
+                }
+                else
+                {
+                    //támadóegységek veszteségei
+                    foreach (var hadseregegyseg in hadsereg.HadseregEgysegek)
+                    {
+                        sajatorszag.OrszagEgysegek.Single(oe => oe.Egyseg.Id == hadseregegyseg.Id).Darab -= Convert.ToInt32(hadseregegyseg.Darab * 0.1);
+                    }
+                }
+
+                //Adott hadsereg törlése
+                db.HadseregEgysegek.RemoveRange(db.HadseregEgysegek.Where(e => e.Hadsereg.Id == hadsereg.Id).ToList());
+                db.Hadseregek.Remove(hadsereg);
+                db.SaveChanges();
             }
 
         }
 
         private bool Csata(Hadsereg hadsereg, Orszag celorszag, Orszag sajatorszag, List<Egyseg> lehetsegesEgysegek)
         {
-            var tamadoertek = 0;
-            var vedoertek = 0;
-
             var tamadoszorzo = 1.0;
             var vedoszorzo = 1.0;
-
 
             //fejlesztések
             //sajatorzsag
@@ -260,10 +297,7 @@ namespace EncoOrszag.Helpers
 
 
             //a hadseregek tamadoertekenek szamitasa
-            foreach (var egyseg in hadsereg.HadseregEgysegek)
-            {
-                tamadoertek += egyseg.Egyseg.Tamadas * egyseg.Darab;
-            }
+            var tamadoertek = hadsereg.HadseregEgysegek.Aggregate(0, (a, b) => a + b.Darab * b.Egyseg.Tamadas);
 
             tamadoertek = Convert.ToInt32(tamadoertek * tamadoszorzo);
             //celorszag vedoerteke
@@ -272,15 +306,12 @@ namespace EncoOrszag.Helpers
 
                 Vedekezes = e.Vedekezes,
                 JelenlegVan =
-               celorszag.OrszagEgysegek.Where(oe => oe.Egyseg.Id == e.Id).Sum(oe => oe.Darab)  //összesegység
-               - celorszag.SajatHadseregek.Sum(h => h.HadseregEgysegek.SingleOrDefault(he => he.Egyseg.Id == e.Id).Darab) //jelenleg hadseregben, tehát nem véd
+                celorszag.OrszagEgysegek.Where(oe => oe.Egyseg.Id == e.Id).Sum(oe => oe.Darab)  //összesegység
+                - celorszag.SajatHadseregek.Sum(h => h.HadseregEgysegek.SingleOrDefault(he => he.Egyseg.Id == e.Id).Darab) //jelenleg hadseregben, tehát nem véd
 
             });
 
-            foreach (var item in vedoegysegek)
-            {
-                vedoertek += item.JelenlegVan * item.Vedekezes;
-            }
+            var vedoertek = vedoegysegek.Aggregate(0, (a, b) => a + b.JelenlegVan * b.Vedekezes);
 
             vedoertek = Convert.ToInt32(vedoertek * vedoszorzo);
 
