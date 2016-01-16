@@ -1,0 +1,25 @@
+﻿@model EncoOrszag.Models.RangsorViewModel
+
+@{
+    ViewBag.Title = "Rangsor";
+}
+
+<h2>Rangsor</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Ország</th>
+            <th>Pontszám</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrszagPontszam)
+        {
+            <tr>
+                <td>@item.Key</td>
+                <td>@item.Value</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
